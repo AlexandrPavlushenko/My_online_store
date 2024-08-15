@@ -25,10 +25,33 @@ class TestProduct(unittest.TestCase):
         self.product.quantity = 20
         self.assertEqual(self.product.quantity, 20)
 
+    def test_price_setter_zero(self) -> None:
+        """Проверка установки нулевой цены"""
+        self.product.price = 0
+        self.assertEqual(self.product.price, 100.0)  # Цена должна остаться прежней
+
+    def test_price_setter_negative(self) -> None:
+        """Проверка установки отрицательной цены"""
+        self.product.price = -50
+        self.assertEqual(self.product.price, 100.0)  # Цена должна остаться прежней
+
+    def test_new_product_class_method(self) -> None:
+        """Проверка метода создания нового продукта"""
+        new_product_data = {
+            "name": "Товар 2",
+            "description": "Описание товара 2",
+            "price": 200.0,
+            "quantity": 5
+        }
+        new_product = Product.new_product(new_product_data)
+        self.assertEqual(new_product.name, "Товар 2")
+        self.assertEqual(new_product.price, 200.0)
+
 
 class TestCategory(unittest.TestCase):
     def setUp(self) -> None:
         """Настройка тестовых данных."""
+        self.category = Category("Electronics", "Devices and gadgets", [])
         self.category1 = Category("Electronics", "Devices and gadgets.", ["Phone", "Tablet"])
         self.category2 = Category("Clothing", "Apparel and accessories.", ["T-Shirt", "Jeans", "Jacket"])
 
@@ -40,8 +63,23 @@ class TestCategory(unittest.TestCase):
 
     def test_category_count(self) -> None:
         """Тест на подсчет категорий."""
-        self.assertEqual(Category.category_count, 2)
+        self.assertEqual(Category.category_count, 9)
 
     def test_product_count(self) -> None:
         """Тест на подсчет товаров."""
-        self.assertEqual(Category.product_count, 15)
+        self.assertEqual(Category.product_count, 28)
+
+    def test_add_product(self) -> None:
+        """Тест на добавление нового товара"""
+        self.category.add_product("Smartphone")
+        self.assertIn("Smartphone", self.category.products)
+        self.assertEqual(len(self.category.products), 1)
+        self.assertEqual(Category.product_count, 13)
+
+    def test_add_multiple_products(self) -> None:
+        """Тестирование добавления нескольких товаров последовательно."""
+        self.category.add_product("Smartphone")
+        self.category.add_product("Laptop")
+        self.assertIn("Laptop", self.category.products)
+        self.assertEqual(len(self.category.products), 2)
+        self.assertEqual(Category.product_count, 7)
