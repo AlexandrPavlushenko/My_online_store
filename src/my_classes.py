@@ -30,6 +30,12 @@ class Product:
         else:
             self.__price = value
 
+    def __str__(self):
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        return f"{self.price * self.quantity + other.price * other.quantity} руб."
+
 
 class Category:
     """Класс:Категория товара. Свойства: Наименование категории
@@ -47,12 +53,18 @@ class Category:
         Category.product_count += len(products)
 
     @property
-    def products(self):
+    def products(self) -> str:
         products_str = ""
         for product in self.__products:
-            products_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
+            products_str += f"{str(product)}\n"
         return products_str
 
     def add_product(self, product) -> None:
         self.__products.append(product)
         Category.product_count += 1
+
+    def __str__(self) -> str:
+        count = 0
+        for i in self.__products:
+            count += i.quantity
+        return f"{self.name}, количество продуктов: {count} шт."
