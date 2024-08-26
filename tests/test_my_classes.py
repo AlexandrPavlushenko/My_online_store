@@ -1,59 +1,125 @@
+import pytest
 from src.my_classes import Category, Product
 
 
-def test_product_creation():
-    # Фикстура для теста
-    product_data = {
-        "name": "Товар 1",
-        "description": "Описание товара 1",
+@pytest.fixture
+def product_data():
+    """Возвращает данные для создания тестового товара."""
+    return {
+        "name": "Товар A",
+        "description": "Описание товара A",
         "price": 100.0,
-        "quantity": 20
+        "quantity": 10
     }
 
-    product = Product.new_product(product_data)
 
-    assert product.name == "Товар 1"
-    assert product.description == "Описание товара 1"
-    assert product.price == 100.0
-    assert product.quantity == 20
-
-
-def test_product_str_method():
-    product = Product("Товар 2", "Описание товара 2", 150.0, 5)
-    assert str(product) == "Товар 2, 150.0 руб. Остаток: 5 шт."
-
-
-def test_price_setter():
-    product = Product("Товар 3", "Описание товара 3", 200.0, 10)
-    product.price = 250.0
-    assert product.price == 250.0
-
-    product.price = -50.0  # Попробуем установить отрицательную цену
-    assert product.price != -50.0  # Цена не должна измениться
+@pytest.fixture
+def invalid_product_data():
+    """Возвращает некорректные данные для тестирования."""
+    return {
+        "name": "Товар B",
+        "description": "Описание товара B",
+        "price": 0,
+        "quantity": -5
+    }
 
 
-def test_category_creation():
-    product1 = Product("Товар 1", "Описание товара 1", 100.0, 5)
-    product2 = Product("Товар 2", "Описание товара 2", 150.0, 10)
-    category = Category("Категория 1", "Описание категории 1", [product1, product2])
+@pytest.fixture
+def product(product_data):
+    """Создает объект товара на основе фикстуры product_data."""
+    return Product.new_product(product_data)
 
+
+@pytest.fixture
+def category(product):
+    """Создает категорию с одним товаром."""
+    return Category("Категория 1", "Описание категории 1", [product])
+
+
+def test_product_creation(product_data):
+    """Проверяет создание товара с корректными данными."""
+    prod = Product.new_product(product_data)
+    assert prod.name == "Товар A"
+    assert prod.description == "Описание товара A"
+    assert prod.price == 100.0
+    assert prod.quantity == 10
+
+
+def test_product_price_setter_invalid_zero(product):
+    """Проверяет, что установка цены равной нулю не позволяет сохранить ее."""
+    product.price = 0
+    assert product.price != 0
+
+
+def test_product_price_setter_invalid_negative(product):
+    """Проверяет, что установка отрицательной цены не работает."""
+    product.price = -50
+    assert product.price != -50
+
+
+def test_product_str(product):
+    """Проверяет строковое представление товара."""
+    assert str(product) == "Товар A, 100.0 руб. Остаток: 10 шт."
+
+
+def test_product_addition(product):
+    """Проверяет, что сложение двух товаров возвращает правильную сумму."""
+    product2_data = {
+        "name": "Товар B",
+        "description": "Описание товара B",
+        "price": 50.0,
+        "quantity": 5
+    }
+    product2 = Product.new_product(product2_data)
+    total_price = product + product2
+    assert total_price == "1250.0 руб."
+
+
+def test_category_creation(category):
+    """Проверяет создание категории с товарами."""
     assert category.name == "Категория 1"
     assert category.description == "Описание категории 1"
-    assert len(category.products.split('\n')) - 1 == 2  # количество продуктов
+    assert len(category._Category__products) == 1
 
 
-def test_category_add_product():
-    product = Product("Товар 3", "Описание товара 3", 200.0, 2)
-    category = Category("Категория 2", "Описание категории 2", [])
+def test_category_add_product(category):
+    """Проверяет добавление товара в категорию."""
+    new_product_data = {
+        "name": "Товар C",
+        "description": "Описание товара C",
+        "price": 30.0,
+        "quantity": 3
+    }
+    new_product = Product.new_product(new_product_data)
+    category.add_product(new_product)
+    assert len(category._Category__products) == 2
+    assert Category.product_count == 3
 
-    category.add_product(product)
 
-    assert len(category.products.split('\n')) - 1 == 1  # теперь должно быть 1 товар в категории
+def test_category_add_invalid_product(category):
+    """Проверяет, что добавление неправильного типа вызывает ошибку."""
+    with pytest.raises(TypeError):
+        category.add_product("Некорректный продукт")
 
 
-def test_category_total_products_count():
-    product1 = Product("Товар 1", "Описание товара 1", 100.0, 5)
-    product2 = Product("Товар 2", "Описание товара 2", 150.0, 10)
-    category = Category("Категория 3", "Описание категории 3", [product1, product2])
+def test_category_str(category):
+    """Проверяет строковое представление категории."""
+    assert str(category) == "Категория 1, количество продуктов: 10 шт."
 
-    assert str(category) == "Категория 3, количество продуктов: 15 шт."
+
+def test_category_product_count(category):
+    """Проверяет общий счетчик товаров в категории."""
+    assert Category.product_count == 6
+    category.add_product(Product.new_product({
+        "name": "Товар D",
+        "description": "Описание товара D",
+        "price": 20,
+        "quantity": 2
+    }))
+    assert Category.product_count == 7
+
+
+def test_product_quantity_change(product):
+    """Проверяет, что изменение количества товара обновляет объект."""
+    product.quantity = 15
+    assert product.quantity == 15

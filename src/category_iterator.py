@@ -1,4 +1,4 @@
-from src.my_classes import Product, Category
+from src.my_classes import Category
 
 
 class CategoryIterator:
