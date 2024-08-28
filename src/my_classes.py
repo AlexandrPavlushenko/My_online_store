@@ -1,8 +1,9 @@
 class Product:
-    """Класс: Товары. Свойства: Наименование товара
-    Описание товара
-    Цена товара
-    Количество товара"""
+    """Класс: Товары.
+    :arg name - Наименование товара
+    :arg description - Описание товара
+    :arg price - Цена товара
+    :arg quantity - Количество товара"""
 
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
@@ -34,16 +35,19 @@ class Product:
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-        return f"{self.price * self.quantity + other.price * other.quantity} руб."
+        if type(other) is self.__class__:
+            return f"{self.price * self.quantity + other.price * other.quantity} руб."
+        raise TypeError
 
 
 class Category:
-    """Класс:Категория товара. Свойства: Наименование категории
-    Описание категории
-    Список товаров в категории"""
+    """Класс:Категория товара.
+    :arg name - Наименование категории
+    :arg description - Описание категории
+    :arg products - Список товаров в категории"""
 
-    category_count = 0
-    product_count = 0
+    category_count = 0  # Счетчик товаров в категории
+    product_count = 0  # Общий счетчик товаров
 
     def __init__(self, name: str, description: str, products: list) -> None:
         self.name = name
@@ -56,12 +60,15 @@ class Category:
     def products(self) -> str:
         products_str = ""
         for product in self.__products:
-            products_str += f"{str(product)}\n"
+            products_str += f"{str(product)}| "
         return products_str
 
     def add_product(self, product) -> None:
-        self.__products.append(product)
-        Category.product_count += 1
+        if isinstance(product, Product):
+            self.__products.append(product)
+            Category.product_count += 1
+        else:
+            raise TypeError
 
     def __str__(self) -> str:
         count = 0
