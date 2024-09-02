@@ -10,6 +10,7 @@ class LawnGrass(Product):
     :arg country - Страна-производитель
     :arg germination_period - Срок прорастания
     :arg color - Цвет"""
+
     def __init__(
         self,
         name: str,

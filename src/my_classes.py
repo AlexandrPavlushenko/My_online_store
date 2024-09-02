@@ -1,4 +1,8 @@
-class Product:
+from src.class_base_product import BaseProduct, BaseEntity
+from src.print_mixin import PrintMixin
+
+
+class Product(BaseProduct, PrintMixin):
     """Класс: Товары.
     :arg name - Наименование товара
     :arg description - Описание товара
@@ -10,15 +14,15 @@ class Product:
         self.description = description
         self.price = price
         self.quantity = quantity
+        super().__init__()
+
+    def __str__(self):
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     @classmethod
     def new_product(cls, new_product: dict):
         """Взвращает созданный объект класса Product из параметров товара в словаре"""
-        name = new_product["name"]
-        description = new_product["description"]
-        price = new_product["price"]
-        quantity = new_product["quantity"]
-        return cls(name, description, price, quantity)
+        return cls(**new_product)
 
     @property
     def price(self):
@@ -31,16 +35,13 @@ class Product:
         else:
             self.__price = value
 
-    def __str__(self):
-        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
-
-    def __add__(self, other):
+    def __add__(self, other) -> str:
         if type(other) is self.__class__:
             return f"{self.price * self.quantity + other.price * other.quantity} руб."
         raise TypeError
 
 
-class Category:
+class Category(BaseEntity):
     """Класс:Категория товара.
     :arg name - Наименование категории
     :arg description - Описание категории
@@ -50,6 +51,7 @@ class Category:
     product_count = 0  # Общий счетчик товаров
 
     def __init__(self, name: str, description: str, products: list) -> None:
+        super().__init__(name, description)
         self.name = name
         self.description = description
         self.__products = products
