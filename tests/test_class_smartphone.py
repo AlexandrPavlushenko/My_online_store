@@ -1,11 +1,12 @@
 import unittest
 from unittest.mock import patch
+
 from src.class_smartphone import Smartphone
 
 
 class TestSmartphone(unittest.TestCase):
 
-    @patch('src.my_classes.Product')
+    @patch("src.my_classes.Product")
     def test_smartphone_initialization(self, MockProduct):
         # Настройка имитации поведения базового класса Product
         MockProduct.return_value = None
@@ -19,7 +20,7 @@ class TestSmartphone(unittest.TestCase):
             efficiency=99.9,
             model="iPhone 14 Pro",
             memory=128,
-            color="Синий"
+            color="Синий",
         )
 
         # Проверка инициализации свойств

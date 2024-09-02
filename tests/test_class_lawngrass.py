@@ -1,11 +1,12 @@
 import unittest
-from src.class_lawngrass import LawnGrass
 from unittest.mock import patch
+
+from src.class_lawngrass import LawnGrass
 
 
 class TestLawnGrass(unittest.TestCase):
 
-    @patch('src.my_classes.Product')
+    @patch("src.my_classes.Product")
     def test_lawn_grass_initialization(self, MockProduct):
         # Настройка имитации поведения базового класса Product
         MockProduct.return_value = None
@@ -18,7 +19,7 @@ class TestLawnGrass(unittest.TestCase):
             quantity=100,
             country="Россия",
             germination_period="7-14 дней",
-            color="Зеленый"
+            color="Зеленый",
         )
 
         # Проверка инициализации свойств
